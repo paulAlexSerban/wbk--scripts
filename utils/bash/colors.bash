@@ -6,17 +6,17 @@ export BLUE='\033[0;34m'
 export YELLOW='\033[0;33m'
 
 print_info() {
-    echo -e "${BLUE}[ INFO ]: $@ ${NC}"
+    echo -e "${BLUE}[ INFO ]${NC} $@ "
 }
 
 print_success() {
-    echo -e "${GREEN}[ INFO ]: $@ ${NC}"
+    echo -e "${GREEN}[ SUCCESS ]${NC} $@ "
 }
 
 print_warning() {
-    echo -e "${YELLOW}[ INFO ]: $@ ${NC}"
+    echo -e "${YELLOW}[ WARNING ]${NC} $@ "
 }
 
 print_error() {
-    echo -e "${RED}[ INFO ]: $@ ${NC}"
+    echo -e "${RED}[ ERROR ]${NC} $@ "
 }

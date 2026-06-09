@@ -4,5 +4,5 @@ cd "$(dirname "$0")" || exit
 
 source "../utils/bash/colors.bash"
 
-print_info "git username: $(git config user.name)"
-print_info "git email: $(git config user.email)"
+IP=$(ifconfig en0 | awk '$1 == "inet" {print $2}')
+print_info "your ip is: $IP"

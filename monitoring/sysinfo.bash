@@ -1,26 +1,27 @@
 #!/bin/bash
+# makes sure the folder containing the script will be the root folder
+cd "$(dirname "$0")" || exit
 
-function get-sysinfo() {
-    echo "System Information" >/tmp/sysinfo.txt
-    echo "Date: $(date)" >>/tmp/sysinfo.txt
-    echo "--------------------------------------------------------------------------------" >>/tmp/sysinfo.txt
-    echo "Hostname: $(hostname)" >>/tmp/sysinfo.txt
-    echo "--------------------------------------------------------------------------------" >>/tmp/sysinfo.txt
-    echo "Kernel Version: $(uname -r)" >>/tmp/sysinfo.txt
-    echo "--------------------------------------------------------------------------------" >>/tmp/sysinfo.txt
-    echo "Uptime: $(uptime)" >>/tmp/sysinfo.txt
-    echo "--------------------------------------------------------------------------------" >>/tmp/sysinfo.txt
-    echo "File System: $(df -h)" >>/tmp/sysinfo.txt
-    echo "--------------------------------------------------------------------------------" >>/tmp/sysinfo.txt
-    echo "Network Configuration: $(ifconfig)" >>/tmp/sysinfo.txt
-    echo "--------------------------------------------------------------------------------" >>/tmp/sysinfo.txt
-    echo "Environment Variables: $(printenv)" >>/tmp/sysinfo.txt
-    echo "--------------------------------------------------------------------------------" >>/tmp/sysinfo.txt
-    echo "DNS Servers: $(cat /etc/resolv.conf | grep nameserver)" >>/tmp/sysinfo.txt
-    echo "--------------------------------------------------------------------------------" >>/tmp/sysinfo.txt
+source "../utils/bash/colors.bash"
 
-    code /tmp/sysinfo.txt
+function get_sysinfo() {
+    print_info "System Information"
+    print_info "Date: $(date)"
+    print_info "--------------------------------------------------------------------------------"
+    print_info "Hostname: $(hostname)"
+    print_info "--------------------------------------------------------------------------------"
+    print_info "Kernel Version: $(uname -r)"
+    print_info "--------------------------------------------------------------------------------"
+    print_info "Uptime: $(uptime)"
+    print_info "--------------------------------------------------------------------------------"
+    print_info "File System: $(df -h)"
+    print_info "--------------------------------------------------------------------------------"
+    print_info "Network Configuration: $(ifconfig)"
+    print_info "--------------------------------------------------------------------------------"
+    print_info "Environment Variables: $(printenv)"
+    print_info "--------------------------------------------------------------------------------"
+    print_info "DNS Servers: $(cat /etc/resolv.conf | grep nameserver)"
+    print_info "--------------------------------------------------------------------------------"
 }
 
-echo "${GREEN}--- sysinfo scripts loaded${NC}"
-echo "         available commands: get-sysinfo"
+get_sysinfo

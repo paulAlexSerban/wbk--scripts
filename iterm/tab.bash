@@ -62,6 +62,3 @@ EOF
         ;;
     esac
 }
-
-echo "${GREEN}--- iTerm Tab scripts loaded${NC}"
-echo "         available commands: tab"

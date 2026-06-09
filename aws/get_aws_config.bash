@@ -4,5 +4,5 @@ cd "$(dirname "$0")" || exit
 
 source "../utils/bash/colors.bash"
 
-print_info "git username: $(git config user.name)"
-print_info "git email: $(git config user.email)"
+print_info "current aws profile: $(aws configure get profile)"
+print_info "current aws region: $(aws configure get region)"
