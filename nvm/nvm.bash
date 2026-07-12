@@ -1,8 +1,4 @@
 #!/bin/bash
-# makes sure the folder containing the script will be the root folder
-cd "$(dirname "$0")" || exit
-
-source "../utils/bash/colors.bash"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
@@ -15,9 +11,12 @@ function set_local_node_version() {
   nvm use
 }
 
-if [ -f .nvmrc ]; then
-  set_local_node_version
+if [ -f .nvmrc ] && [ -n "$BASH_VERSION" ]; then
+  PROMPT_COMMAND="set_local_node_version; $PROMPT_COMMAND"
+elif [ -f .nvmrc ] && [ -n "$ZSH_VERSION" ]; then
+  chpwd_functions+=(set_local_node_version)
+  set_local_node_version # Run on startup
 else
-  print_error "no .nvmrc file found"
-  print_info "current node version: ${BLUE}$(node -v)${NC}"
+  echo "no .nvmrc file found"
+  echo "current node version: $(node -v)"
 fi
