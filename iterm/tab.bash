@@ -6,8 +6,7 @@
 # Author: Justin Hileman (http://justinhileman.com)
 #
 # Installation:
-#     Add the following function to your `.bashrc` or `.bash_profile`,
-#     or save it somewhere (e.g. `~/.tab.bash`) and source it in `.bashrc`
+#     Source this file from `.bashrc` / `.zshrc` (macOS only).
 #
 # Usage:
 #     tab                   Opens the current directory in a new tab
@@ -15,20 +14,28 @@
 #     tab [CMD]             Open a new tab and execute CMD
 #     tab [PATH] [CMD] ...  You can prob'ly guess
 
-# Only for Mac users
-[ $(uname -s) != "Darwin" ] && return
+if [ -n "${BASH_SOURCE[0]:-}" ]; then
+    # shellcheck disable=SC1091
+    source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/bash/is_macos.bash"
+fi
+
+if declare -f is_macos >/dev/null 2>&1; then
+    is_macos || return 0 2>/dev/null || exit 0
+else
+    [[ "$(uname)" == "Darwin" ]] || return 0 2>/dev/null || exit 0
+fi
 
 function tab() {
     local cmd=""
     local cdto="$PWD"
-    local args="$@"
+    local args="$*"
 
     if [ -d "$1" ]; then
         cdto=$(
             cd "$1"
             pwd
         )
-        args="${@:2}"
+        args="${*:2}"
     fi
 
     if [ -n "$args" ]; then

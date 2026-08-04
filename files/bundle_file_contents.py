@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-bundle.py — Collect matching source files into a single Markdown file.
+bundle_file_contents.py — Collect matching source files into a single Markdown file.
 
 Usage:
-    python bundle.py [OPTIONS]
+    python bundle_file_contents.py [OPTIONS]
 
 Options:
     -r, --root       DIR     Root directory to scan (default: current dir)
     -p, --patterns   GLOBS   Pipe-separated glob patterns  (default: *.js|*.jsx)
-    -e, --exclude    DIRS    Pipe-separated dirs to skip    (default: node_modules|.git|dist)
+    -e, --exclude    DIRS    Pipe-separated dirs to skip
+                             (default: node_modules|.git|dist|.next|__pycache__|.venv|coverage)
     -o, --output     FILE    Output markdown file           (default: bundle.md)
     --max-bytes      N       Skip files larger than N bytes (default: 500000)
 
 Examples:
-    python bundle.py -p "*.py" -e "__pycache__|.venv" -o snapshot.md
-    python bundle.py -r ./src -p "*.ts|*.tsx" -o review.md
+    python bundle_file_contents.py -p "*.py" -e "__pycache__|.venv" -o snapshot.md
+    python bundle_file_contents.py -r ./src -p "*.ts|*.tsx" -o review.md
 """
 
 import argparse

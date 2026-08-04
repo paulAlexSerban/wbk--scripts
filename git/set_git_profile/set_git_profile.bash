@@ -1,88 +1,98 @@
 #!/bin/bash
+# Source from ~/.bashrc or ~/.zshrc. Do not execute.
+# Switches Git identity / SSH / GPG from ~/.git_profiles.json by path or via `gprofile`.
 
-# Path to your JSON config
-GIT_CONFIG_JSON="$HOME/.git_profiles.json"
+GIT_CONFIG_JSON="${GIT_CONFIG_JSON:-$HOME/.git_profiles.json}"
 
 set_git_profile() {
-    local key=$1
+  local key=$1
 
-    # Check if jq is installed
-    if ! command -v jq &> /dev/null; then
-        echo "❌ Error: 'jq' is not installed. Install it with 'brew install jq' or 'sudo apt install jq'."
-        return 1
-    fi
+  if ! command -v jq >/dev/null 2>&1; then
+    echo "Error: jq is not installed. Install with 'brew install jq' or 'sudo apt install jq'."
+    return 1
+  fi
 
-    # Check if the profile exists in JSON
-    local exists=$(jq -r "has(\"$key\")" "$GIT_CONFIG_JSON")
-    if [ "$exists" != "true" ]; then
-        echo "❌ Profile '$key' not found in $GIT_CONFIG_JSON"
-        return 1
-    fi
+  if [ ! -f "$GIT_CONFIG_JSON" ]; then
+    echo "Error: config not found at $GIT_CONFIG_JSON"
+    return 1
+  fi
 
-    # Extract values from JSON
-    local name=$(jq -r ".\"$key\".name" "$GIT_CONFIG_JSON")
-    local email=$(jq -r ".\"$key\".email" "$GIT_CONFIG_JSON")
-    local ssh_key=$(jq -r ".\"$key\".ssh_key" "$GIT_CONFIG_JSON")
-    local gpg_key=$(jq -r ".\"$key\".gpg_key" "$GIT_CONFIG_JSON")
+  if [ -z "$key" ]; then
+    echo "Usage: gprofile <profile>"
+    return 1
+  fi
 
-    # Apply Git Config
-    git config --global user.name "$name"
-    git config --global user.email "$email"
-    
-    if [ -n "$gpg_key" ] && [ "$gpg_key" != "null" ]; then
-        git config --global user.signingkey "$gpg_key"
-    fi
+  local exists
+  exists=$(jq -r --arg key "$key" 'has($key)' "$GIT_CONFIG_JSON")
+  if [ "$exists" != "true" ]; then
+    echo "Profile '$key' not found in $GIT_CONFIG_JSON"
+    return 1
+  fi
 
-    # Handle SSH Key
-    ssh-add -D &>/dev/null
-    eval ssh-add "${ssh_key/#\~/$HOME}" &>/dev/null
+  local name email ssh_key gpg_key expanded_key
+  name=$(jq -r --arg key "$key" '.[$key].name // empty' "$GIT_CONFIG_JSON")
+  email=$(jq -r --arg key "$key" '.[$key].email // empty' "$GIT_CONFIG_JSON")
+  ssh_key=$(jq -r --arg key "$key" '.[$key].ssh_key // empty' "$GIT_CONFIG_JSON")
+  gpg_key=$(jq -r --arg key "$key" '.[$key].gpg_key // empty' "$GIT_CONFIG_JSON")
 
-    echo "🔄 Active GitHub Profile: $key ($email)"
+  git config --global user.name "$name"
+  git config --global user.email "$email"
+
+  if [ -n "$gpg_key" ] && [ "$gpg_key" != "null" ]; then
+    git config --global user.signingkey "$gpg_key"
+  fi
+
+  if [ -n "$ssh_key" ] && [ "$ssh_key" != "null" ]; then
+    expanded_key="${ssh_key/#\~/$HOME}"
+    ssh-add -D >/dev/null 2>&1
+    ssh-add "$expanded_key" >/dev/null 2>&1
+  fi
+
+  echo "Active GitHub profile: $key ($email)"
 }
 
-# Path-based auto-switcher
-# Path-based auto-switcher
+# Match profile.path as a path segment (avoids "personal" matching "personal-projects").
+_path_matches_profile() {
+  local current_dir=$1
+  local path_pattern=$2
+  local normalized="${current_dir}/"
+
+  [[ "$normalized" == *"/${path_pattern}/"* ]] || [[ "$normalized" == "${path_pattern}/"* ]] || [[ "$current_dir" == "$path_pattern" ]]
+}
+
 check_git_profile_by_path() {
-    local current_dir=$(pwd)
-    
-    # Check if the JSON file exists and is valid first to avoid spamming terminal errors
-    if [ ! -f "$GIT_CONFIG_JSON" ]; then
-        return
-    fi
-    
-    # Robust jq filter: iterates over top keys, ensures the value is an object, 
-    # verifies 'path' exists as a string, and looks for a substring match.
-    local profile=$(jq -r --arg current_dir "$current_dir" '
-        . as $profiles |
-        keys_unsorted[] as $k |
-        $profiles[$k] as $p |
-        select(
-            ($p | type == "object") and
-            ($p.path | type == "string") and
-            ($current_dir | contains($p.path))
-        ) | $k
-    ' "$GIT_CONFIG_JSON" | head -n 1)
+  local current_dir profile target_email path_pattern
 
-    # If no match or null, exit without changing anything
-    if [[ -z "$profile" || "$profile" == "null" ]]; then
-        return
-    fi
+  if [ ! -f "$GIT_CONFIG_JSON" ] || ! command -v jq >/dev/null 2>&1; then
+    return 0
+  fi
 
-    # Verify if a switch is actually needed to prevent redundant output on every prompt load
-    local target_email=$(jq -r ".\"$profile\".email" "$GIT_CONFIG_JSON")
-    if [[ "$(git config --global user.email)" != "$target_email" ]]; then
+  current_dir=$(pwd)
+
+  while IFS= read -r profile; do
+    [ -z "$profile" ] || [ "$profile" = "null" ] && continue
+    path_pattern=$(jq -r --arg key "$profile" '.[$key].path // empty' "$GIT_CONFIG_JSON")
+    [ -z "$path_pattern" ] && continue
+
+    if _path_matches_profile "$current_dir" "$path_pattern"; then
+      target_email=$(jq -r --arg key "$profile" '.[$key].email // empty' "$GIT_CONFIG_JSON")
+      if [[ "$(git config --global user.email 2>/dev/null)" != "$target_email" ]]; then
         set_git_profile "$profile"
+      fi
+      return 0
     fi
-
-    echo "🔄 Automatically switched to $profile ($target_email)"
+  done < <(jq -r 'to_entries[] | select(.value | type == "object" and (.path | type == "string")) | .key' "$GIT_CONFIG_JSON")
 }
 
-# Register Hooks
 alias gprofile=set_git_profile
 
 if [ -n "$BASH_VERSION" ]; then
-    PROMPT_COMMAND="check_git_profile_by_path; $PROMPT_COMMAND"
+  if [[ ":${PROMPT_COMMAND}:" != *":check_git_profile_by_path:"* ]]; then
+    PROMPT_COMMAND="check_git_profile_by_path${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+  fi
 elif [ -n "$ZSH_VERSION" ]; then
+  if ! (( ${chpwd_functions[(Ie)check_git_profile_by_path]} )); then
     chpwd_functions+=(check_git_profile_by_path)
-    check_git_profile_by_path # Run on startup
+  fi
+  check_git_profile_by_path
 fi

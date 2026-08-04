@@ -1,103 +1,70 @@
-Here is a complete, configurable Bash solution that automates switching between your personal and work GitHub profiles.
+# Git profile switcher
 
-It handles **SSH keys**, **Git config identity (name/email)**, and optionally your **GPG signing keys**—either automatically when you navigate into a specific folder path, or manually via a quick CLI command.
+Automates switching between GitHub identities: **SSH keys**, **Git name/email**, and optional **GPG signing keys** — by folder path or via `gprofile`.
 
----
+## Requirements
 
-## Step 1: Organize Your SSH Keys
+- `jq` — macOS: `brew install jq` · Ubuntu/Debian: `sudo apt install jq`
+- Separate SSH keys per profile (see [ssh_and_gpg_keys.md](ssh_and_gpg_keys.md))
 
-To make this work seamlessly, ensure you have separate SSH keys generated for each profile (e.g., `~/.ssh/id_rsa_personal` and `~/.ssh/id_rsa_work`).
+## Config
 
-If you haven't done this yet, generate them using:
+Create `$HOME/.git_profiles.json` (override path with `GIT_CONFIG_JSON`):
 
-```bash
-ssh-keygen -t ed25519 -C "your_personal_email@example.com" -f ~/.ssh/id_rsa_personal
-ssh-keygen -t ed25519 -C "your_work_email@company.com" -f ~/.ssh/id_rsa_work
-
-```
-
-*Make sure both public keys are added to their respective GitHub accounts.*
-
----
-
-## Step 2: The Core Bash Script
-
-Add the following script to your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc` if you use Zsh).
-
-### Configuration Section
-Create a file at `~/.git-profiles.json`:
 ```json
 {
   "personal": {
     "name": "Your Name",
     "email": "personal@email.com",
-    "ssh_key": "~/.ssh/id_rsa_personal",
-    "path_keyword": "projects/personal",
+    "ssh_key": "~/.ssh/id_ed25519_personal",
+    "path": "projects/personal",
     "gpg_key": ""
   },
   "work": {
     "name": "Work Name",
     "email": "work@company.com",
-    "ssh_key": "~/.ssh/id_rsa_work",
-    "path_keyword": "projects/work",
+    "ssh_key": "~/.ssh/id_ed25519_work",
+    "path": "projects/work",
     "gpg_key": "ABC12345"
   }
 }
 ```
 
+`path` is matched as a **path segment** inside `$PWD` (so `personal` will not match `personal-projects`).
 
-## Step 3: Apply the Changes
+## Install
 
-After saving the configuration file, reload your terminal profile:
-
-```bash
-source ~/.bashrc   # Or source ~/.zshrc if using Zsh
-
-```
-
----
-
-## How to Use It
-### Option A: The Automatic Way (Folder Paths)
-Simply change directories in your terminal. The script tracks your path and shifts configurations dynamically:
+Source the script from your shell rc (do **not** paste the script body into it):
 
 ```bash
-cd ~/projects/work/some-repo
-# Output: 🔄 Switched to WORK GitHub profile (your_work_email@company.com)
-
-cd ~/projects/personal/my-side-project
-# Output: 🔄 Switched to PERSONAL GitHub profile (your_personal_email@example.com)
-
+# ~/.bashrc or ~/.zshrc
+source /path/to/wbk--scripts/git/set_git_profile/set_git_profile.bash
 ```
 
-Because the function is tied to the terminal hook, opening a new terminal window directly inside those directories will instantly configure the correct profile on startup.
+Reload:
 
-### Option B: The Manual Way (CLI Command)
-If you are working outside your dedicated directories, use the `gprofile` command to jump profiles manually:
+```bash
+source ~/.bashrc   # or ~/.zshrc
+```
+
+## Usage
+
+**Automatic:** `cd` into a directory whose path contains a profile’s `path` segment. The hook switches only when the global `user.email` differs (quiet otherwise).
+
+**Manual:**
 
 ```bash
 gprofile work
 gprofile personal
-
 ```
 
----
-> 💡 **Pro-Tip for SSH Config:** If you use multiple accounts on the *same* machine for `github.com`, GitHub's SSH routing can sometimes get confused if you rely entirely on the SSH agent. To guarantee a perfect handoff, add this to your `~/.ssh/config`:
-> ```text
-> Host github.com
->   IdentityAgent identityAgent
->   IdentitiesOnly yes
-> 
-> ```
-> 
-> 
-> This forces SSH to strictly use the active key currently loaded into your `ssh-agent` by the script above, rather than guessing or trying cached keys sequentially.
->
+## SSH config tip
 
----
+If multiple GitHub accounts share `github.com`, prefer:
 
-## Requirements
-To use this you must have jq installed:
+```text
+Host github.com
+  IdentitiesOnly yes
+```
 
-Mac: `brew install jq`
-Ubuntu/Debian: s`udo apt install jq`
+so SSH uses the key loaded into the agent by this script.
