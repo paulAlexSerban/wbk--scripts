@@ -14,8 +14,8 @@ function set_local_node_version() {
 if [ -f .nvmrc ] && [ -n "$BASH_VERSION" ]; then
   PROMPT_COMMAND="set_local_node_version; $PROMPT_COMMAND"
 elif [ -f .nvmrc ] && [ -n "$ZSH_VERSION" ]; then
-  chpwd_functions+=(set_local_node_version)
-  set_local_node_version # Run on startup
+  chpwd_functions+=(nvm use)
+  nvm use # Run on startup
 else
   echo "no .nvmrc file found"
   echo "current node version: $(node -v)"
