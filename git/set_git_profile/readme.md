@@ -1,10 +1,10 @@
 # Git profile switcher
 
-Automates switching between GitHub identities: **SSH keys**, **Git name/email**, and optional **GPG signing keys** — by folder path or via `gprofile`.
+Automates switching between GitHub identities: **SSH keys**, **Git name/email**, and optional **GPG signing keys** - by folder path or via `gprofile`.
 
 ## Requirements
 
-- `jq` — macOS: `brew install jq` · Ubuntu/Debian: `sudo apt install jq`
+- `jq` - macOS: `brew install jq` · Ubuntu/Debian: `sudo apt install jq`
 - Separate SSH keys per profile (see [ssh_and_gpg_keys.md](ssh_and_gpg_keys.md))
 
 ## Config

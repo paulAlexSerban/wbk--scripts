@@ -21,12 +21,12 @@ networking/   IP helpers
 nvm/          NVM + .nvmrc auto-use hooks
 ssh/          Interactive SSH with PEM
 utils/bash/   Shared Bash helpers (colors, OS checks)
-archive/      Frozen leftovers — do not use for new work
+archive/      Frozen leftovers - do not use for new work
 ```
 
 Put new scripts in the matching domain folder. Create a new top-level folder only when the domain does not fit an existing one.
 
-Do **not** revive or extend scripts under `archive/` — fix/port into an active domain folder instead if something becomes useful again.
+Do **not** revive or extend scripts under `archive/` - fix/port into an active domain folder instead if something becomes useful again.
 
 ## Languages & tooling
 
@@ -83,7 +83,7 @@ Do not `cd "$(dirname "$0")"` in hook scripts that must preserve the user’s wo
 3. Match the existing language style in that folder.
 4. For Bash: start from the `cd` + `colors.bash` template above.
 5. Document non-obvious setup in a nearby `readme.md` only when the script needs external config (example: `git/set_git_profile/`).
-6. Update `.env.example` if new secrets/config keys are required — never put real values there.
+6. Update `.env.example` if new secrets/config keys are required - never put real values there.
 7. Update the inventory table in `README.md`.
 
 ## Safety & scope
@@ -98,8 +98,8 @@ Do not `cd "$(dirname "$0")"` in hook scripts that must preserve the user’s wo
 
 Recent history prefers short conventional prefixes:
 
-- `feat: …` — new script or capability
-- `fix: …` — bug fix
+- `feat: …` - new script or capability
+- `fix: …` - bug fix
 - `updates` / brief imperative messages also appear; prefer `feat` / `fix` when committing
 
 Only commit when the user asks.

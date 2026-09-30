@@ -1,6 +1,6 @@
 # Archive
 
-Frozen leftovers from earlier iterations of this repo. Scripts here are **superseded, broken, or one-offs** — not for daily use.
+Frozen leftovers from earlier iterations of this repo. Scripts here are **superseded, broken, or one-offs** - not for daily use.
 
 | Path | Why archived |
 |------|----------------|

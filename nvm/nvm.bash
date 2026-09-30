@@ -9,7 +9,7 @@ if [ -s "$NVM_DIR/nvm.sh" ]; then
   . "$NVM_DIR/nvm.sh"
 fi
 
-# Bash completion only — noisy / broken under Zsh.
+# Bash completion only - noisy / broken under Zsh.
 if [ -n "$BASH_VERSION" ] && [ -s "$NVM_DIR/bash_completion" ]; then
   # shellcheck disable=SC1091
   . "$NVM_DIR/bash_completion"

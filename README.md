@@ -38,7 +38,7 @@ Git profiles: see [git/set_git_profile/readme.md](git/set_git_profile/readme.md)
 
 ## Archive
 
-Weak or superseded scripts live under [`archive/`](archive/) — see that folder’s README. Not for daily use.
+Weak or superseded scripts live under [`archive/`](archive/) - see that folder’s README. Not for daily use.
 
 ## Agent notes
 

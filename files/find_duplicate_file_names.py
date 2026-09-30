@@ -2,7 +2,7 @@
 """
 Find duplicate basenames (same filename, different paths).
 
-This does NOT compare file contents — use find_duplicate_files.py for that.
+This does NOT compare file contents - use find_duplicate_files.py for that.
 
 Examples:
     python find_duplicate_file_names.py /path/to/dir

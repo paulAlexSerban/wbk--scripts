@@ -6,7 +6,7 @@ source "../utils/bash/colors.bash"
 
 ENV_FILE="../.env"
 if [ ! -f "$ENV_FILE" ]; then
-    print_error "missing $ENV_FILE — copy .env.example to .env and set PEM_KEY_FILE / EC2_INSTANCE_IP"
+    print_error "missing $ENV_FILE - copy .env.example to .env and set PEM_KEY_FILE / EC2_INSTANCE_IP"
     exit 1
 fi
 

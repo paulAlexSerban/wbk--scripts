@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-bundle_file_contents.py — Collect matching source files into a single Markdown file.
+bundle_file_contents.py - Collect matching source files into a single Markdown file.
 
 Usage:
     python bundle_file_contents.py [OPTIONS]
@@ -79,7 +79,7 @@ def collect_files(root: Path, patterns: list[str], excluded_dirs: set[str],
             except OSError:
                 continue
             if size > max_bytes:
-                print(f"  [skip — too large {size:,}B] {fpath}", file=sys.stderr)
+                print(f"  [skip - too large {size:,}B] {fpath}", file=sys.stderr)
                 continue
             matches.append(fpath)
     return matches
@@ -95,7 +95,7 @@ def read_text(path: Path) -> str | None:
         except Exception:
             return None
     except OSError as exc:
-        print(f"  [skip — {exc}] {path}", file=sys.stderr)
+        print(f"  [skip - {exc}] {path}", file=sys.stderr)
         return None
 
 
@@ -116,7 +116,7 @@ def write_bundle(files: list[Path], root: Path, output: Path, max_bytes: int) ->
             rel = path.relative_to(root)
             text = read_text(path)
             if text is None:
-                print(f"  [skip — binary or unreadable] {path}", file=sys.stderr)
+                print(f"  [skip - binary or unreadable] {path}", file=sys.stderr)
                 continue
 
             lang = lang_hint(path)
